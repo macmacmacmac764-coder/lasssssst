@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg"
+    android:padding="18dp"
+    android:layoutDirection="rtl">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="انتخاب اپ‌های مجاز"
+        android:textColor="@color/text"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="right"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="اپ‌هایی که انتخاب می‌کنی در Focus Mode قابل استفاده خواهند بود."
+        android:textColor="@color/muted"
+        android:textSize="14sp"
+        android:gravity="right"
+        android:layout_marginTop="6dp"/>
+
+    <ListView
+        android:id="@+id/appList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="#263248"
+        android:dividerHeight="1dp"
+        android:layout_marginTop="14dp"/>
+
+    <Button
+        android:id="@+id/saveApps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ذخیره"
+        android:textColor="@color/bg"
+        android:background="@drawable/bg_primary"/>
+</LinearLayout>

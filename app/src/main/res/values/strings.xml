@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ReGain</string>
+    <string name="accessibility_description">ReGain Focus Mode blocks selected distracting apps while focus mode is active.</string>
+</resources>

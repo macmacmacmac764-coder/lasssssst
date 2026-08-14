@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="28dp"
+    android:background="#0A0E1A">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ReGain"
+        android:textColor="#F8FAFC"
+        android:textSize="32sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Focus Shield"
+        android:textColor="#94A3B8"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="42dp"
+        android:text="Focus mode is off"
+        android:textColor="#F8FAFC"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="30:00"
+        android:textColor="#F8FAFC"
+        android:textSize="42sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/focusButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:text="Start Focus"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/selectedApps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="Allowed apps: 0"
+        android:textColor="#94A3B8"
+        android:textSize="15sp" />
+
+    <Button
+        android:id="@+id/chooseAppsButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Choose allowed apps"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/resetButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Reset"
+        android:textSize="16sp" />
+
+</LinearLayout>
