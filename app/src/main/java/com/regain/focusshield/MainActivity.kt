@@ -14,24 +14,14 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_main)
 
-        val status =
-            findViewById<TextView>(R.id.status)
-
-        val timerView =
-            findViewById<TextView>(R.id.timer)
-
-        val focusButton =
-            findViewById<Button>(R.id.focusButton)
-
-        val resetButton =
-            findViewById<Button>(R.id.resetButton)
-
+        val status = findViewById<TextView>(R.id.status)
+        val timerView = findViewById<TextView>(R.id.timer)
+        val focusButton = findViewById<Button>(R.id.focusButton)
+        val resetButton = findViewById<Button>(R.id.resetButton)
         val chooseAppsButton =
             findViewById<Button>(R.id.chooseAppsButton)
-
         val selectedApps =
             findViewById<TextView>(R.id.selectedApps)
 
@@ -52,64 +42,67 @@ class MainActivity : Activity() {
             focusButton.text = "Start Focus"
         }
 
-        fun startRemainingTimer() {
-
+        fun startTimerFromSavedEnd() {
             timer?.cancel()
             timer = null
 
-            val remaining =
-                Prefs.remaining(this)
+            if (!Prefs.enabled(this)) {
+                resetUi()
+                return
+            }
 
-            if (
-                remaining <= 0L ||
-                !Prefs.enabled(this)
-            ) {
+            val remaining = Prefs.remaining(this)
+
+            if (remaining <= 0L) {
                 resetUi()
                 return
             }
 
             running = true
+            status.text = "Focus mode is active"
+            focusButton.text = "Pause Focus"
 
-            status.text =
-                "Focus mode is active"
+            timer = object : CountDownTimer(
+                remaining,
+                1000L
+            ) {
 
-            focusButton.text =
-                "Pause Focus"
-
-            timer =
-                object : CountDownTimer(
-                    remaining,
-                    1000L
+                override fun onTick(
+                    millisUntilFinished: Long
                 ) {
+                    val totalSeconds =
+                        millisUntilFinished / 1000L
 
-                    override fun onTick(
-                        millisUntilFinished: Long
-                    ) {
+                    val minutes =
+                        totalSeconds / 60L
 
-                        val totalSeconds =
-                            millisUntilFinished / 1000L
+                    val seconds =
+                        totalSeconds % 60L
 
-                        val minutes =
-                            totalSeconds / 60L
+                    timerView.text =
+                        String.format(
+                            "%02d:%02d",
+                            minutes,
+                            seconds
+                        )
+                }
 
-                        val seconds =
-                            totalSeconds % 60L
+                override fun onFinish() {
+                    running = false
+                    timer = null
 
-                        timerView.text =
-                            String.format(
-                                "%02d:%02d",
-                                minutes,
-                                seconds
-                            )
-                    }
+                    Prefs.setFocus(
+                        this@MainActivity,
+                        false
+                    )
 
-                    override fun onFinish() {
-                        resetUi()
+                    status.text =
+                        "Focus session complete"
 
-                        status.text =
-                            "Focus session complete"
-                    }
-                }.start()
+                    timerView.text = "30:00"
+                    focusButton.text = "Start Focus"
+                }
+            }.start()
         }
 
         refreshSelectedApps()
@@ -126,17 +119,14 @@ class MainActivity : Activity() {
         focusButton.setOnClickListener {
 
             if (running) {
-
                 resetUi()
-
             } else {
 
                 val duration =
                     30L * 60L * 1000L
 
                 val endTime =
-                    System.currentTimeMillis() +
-                    duration
+                    System.currentTimeMillis() + duration
 
                 Prefs.setFocus(
                     this,
@@ -144,7 +134,7 @@ class MainActivity : Activity() {
                     endTime
                 )
 
-                startRemainingTimer()
+                startTimerFromSavedEnd()
             }
         }
 
@@ -152,12 +142,8 @@ class MainActivity : Activity() {
             resetUi()
         }
 
-        /*
-         * If Focus was already running before the Activity
-         * was closed, restore it instead of starting 30:00.
-         */
         if (Prefs.enabled(this)) {
-            startRemainingTimer()
+            startTimerFromSavedEnd()
         } else {
             resetUi()
         }
@@ -171,115 +157,13 @@ class MainActivity : Activity() {
         ).text =
             "Allowed apps: ${Prefs.allowed(this).size}"
 
-        /*
-         * Re-check Focus whenever the Activity becomes visible.
-         */
-        if (
-            Prefs.enabled(this) &&
-            !running
-        ) {
-            val timerView =
-                findViewById<TextView>(R.id.timer)
-
-            val focusButton =
-                findViewById<Button>(R.id.focusButton)
-
-            val status =
-                findViewById<TextView>(R.id.status)
-
-            val remaining =
-                Prefs.remaining(this)
+        if (Prefs.enabled(this) && !running) {
+            val remaining = Prefs.remaining(this)
 
             if (remaining > 0L) {
-
-                running = true
-
-                status.text =
-                    "Focus mode is active"
-
-                focusButton.text =
-                    "Pause Focus"
-
-                timer =
-                    object : CountDownTimer(
-                        remaining,
-                        1000L
-                    ) {
-
-                        override fun onTick(
-                            millisUntilFinished: Long
-                        ) {
-
-                            val totalSeconds =
-                                millisUntilFinished /
-                                1000L
-
-                            val minutes =
-                                totalSeconds / 60L
-
-                            val seconds =
-                                totalSeconds % 60L
-
-                            timerView.text =
-                                String.format(
-                                    "%02d:%02d",
-                                    minutes,
-                                    seconds
-                                )
-                        }
-
-                        override fun onFinish() {
-                            timer?.cancel()
-                            timer = null
-                            running = false
-
-                            Prefs.setFocus(
-                                this@MainActivity,
-                                false
-                            )
-
-                            status.text =
-                                "Focus session complete"
-
-                            timerView.text =
-                                "30:00"
-
-                            focusButton.text =
-                                "Start Focus"
-                        }
-                    }.start()
+                recreate()
             }
         }
-    }
-
-    override fun onDestroy() {
-        timer?.cancel()
-        timer = null
-
-        super.onDestroy()
-    }
-}
-                    override fun onFinish() {
-                        resetUi()
-                        status.text =
-                            "Focus session complete"
-                    }
-                }.start()
-            }
-        }
-
-        resetButton.setOnClickListener {
-            resetUi()
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        findViewById<TextView>(
-            R.id.selectedApps
-        ).text =
-            "Allowed apps: ${Prefs.allowed(this).size}"
     }
 
     override fun onDestroy() {
