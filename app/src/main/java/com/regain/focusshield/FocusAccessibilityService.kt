@@ -15,20 +15,24 @@ class FocusAccessibilityService : AccessibilityService() {
     override fun onServiceConnected() {
         super.onServiceConnected()
 
+        // Phone / Dialer
         addResolvedPackages(
             Intent(Intent.ACTION_DIAL)
         )
 
+        // SMS
         addResolvedPackages(
             Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("smsto:")
             }
         )
 
+        // Camera
         addResolvedPackages(
             Intent("android.media.action.IMAGE_CAPTURE")
         )
 
+        // Home / Launcher
         addResolvedPackages(
             Intent(Intent.ACTION_MAIN).apply {
                 addCategory(Intent.CATEGORY_HOME)
@@ -46,7 +50,7 @@ class FocusAccessibilityService : AccessibilityService() {
                     )
                 }
         } catch (_: Exception) {
-            // Ignore device-specific package manager errors.
+            // Never crash the accessibility service.
         }
     }
 
@@ -59,6 +63,9 @@ class FocusAccessibilityService : AccessibilityService() {
                 return
             }
 
+            /*
+             * We only care when the foreground window changes.
+             */
             if (
                 event.eventType !=
                 AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
@@ -67,13 +74,16 @@ class FocusAccessibilityService : AccessibilityService() {
             }
 
             /*
-             * Prefs.enabled() also checks whether the saved
-             * Focus end time has expired.
+             * Prefs.enabled() also checks the saved
+             * Focus end time.
              */
             if (!Prefs.enabled(this)) {
                 return
             }
 
+            /*
+             * Safety check for expired Focus.
+             */
             val endTime = Prefs.end(this)
 
             if (
@@ -84,24 +94,36 @@ class FocusAccessibilityService : AccessibilityService() {
                 return
             }
 
-            val pkg = event.packageName
-                ?.toString()
-                ?: return
+            val pkg =
+                event.packageName?.toString()
+                    ?: return
 
+            /*
+             * Never block ReGain itself.
+             */
             if (pkg == packageName) {
                 return
             }
 
+            /*
+             * System UI, Launcher, Dialer, SMS and Camera
+             * are always allowed.
+             */
             if (pkg in alwaysAllowedPackages) {
                 return
             }
 
+            /*
+             * Apps explicitly selected by the user
+             * are allowed during Focus.
+             */
             if (pkg in Prefs.allowed(this)) {
                 return
             }
 
             /*
-             * Ignore packages that are not normal launchable apps.
+             * Ignore packages that are not normal
+             * launchable applications.
              */
             if (
                 packageManager
@@ -111,13 +133,13 @@ class FocusAccessibilityService : AccessibilityService() {
             }
 
             /*
-             * Open the blocking screen on top of the
-             * application that the user tried to open.
+             * Bring the ReGain blocking screen to the front.
              */
             val blockIntent = Intent(
                 this,
                 BlockActivity::class.java
             ).apply {
+
                 addFlags(
                     Intent.FLAG_ACTIVITY_NEW_TASK or
                     Intent.FLAG_ACTIVITY_CLEAR_TOP or
@@ -129,8 +151,8 @@ class FocusAccessibilityService : AccessibilityService() {
 
         } catch (_: Exception) {
             /*
-             * Never let a third-party app or OEM-specific
-             * accessibility event crash the service.
+             * An OEM-specific accessibility event
+             * must never crash ReGain.
              */
         }
     }
